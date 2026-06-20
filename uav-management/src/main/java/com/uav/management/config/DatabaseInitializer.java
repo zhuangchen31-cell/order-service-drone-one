@@ -45,30 +45,66 @@ public class DatabaseInitializer implements ApplicationRunner {
     }
 
     /**
-     * 执行 SQL 文件
+     * 执行 SQL 文件（逐行读取，按分号分隔语句，跳过注释和空行）
      */
     private void executeSqlFile(String fileName) throws Exception {
         logger.info("执行 SQL 文件: {}", fileName);
-        
+
         ClassPathResource resource = new ClassPathResource(fileName);
+        if (!resource.exists()) {
+            logger.warn("SQL 文件不存在，跳过: {}", fileName);
+            return;
+        }
+
         try (InputStream inputStream = resource.getInputStream();
              BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-            
-            String sqlContent = reader.lines().collect(Collectors.joining("\n"));
-            
-            // 分割 SQL 语句
-            String[] statements = sqlContent.split(";\\s*");
-            
-            for (String statement : statements) {
-                if (!statement.trim().isEmpty()) {
-                    try {
-                        jdbcTemplate.execute(statement);
-                        logger.debug("执行 SQL: {}", statement);
-                    } catch (Exception e) {
-                        logger.warn("执行 SQL 语句失败(可能已存在): {}", statement);
+
+            StringBuilder currentStatement = new StringBuilder();
+            String line;
+            int statementCount = 0;
+
+            while ((line = reader.readLine()) != null) {
+                String trimmed = line.trim();
+                // 跳过注释行和空行
+                if (trimmed.isEmpty() || trimmed.startsWith("--")) {
+                    continue;
+                }
+                currentStatement.append(line).append("\n");
+                // 遇到分号表示语句结束
+                if (trimmed.endsWith(";")) {
+                    String sql = currentStatement.toString().trim();
+                    // 去掉末尾分号
+                    sql = sql.substring(0, sql.length() - 1);
+                    if (!sql.isEmpty()) {
+                        try {
+                            jdbcTemplate.execute(sql);
+                            statementCount++;
+                            logger.debug("SQL 执行成功 ({}): {}", statementCount,
+                                sql.length() > 80 ? sql.substring(0, 80) + "..." : sql);
+                        } catch (Exception e) {
+                            logger.warn("SQL 执行失败(可能已存在): {} - 原因: {}",
+                                sql.length() > 80 ? sql.substring(0, 80) + "..." : sql,
+                                e.getMessage());
+                        }
                     }
+                    currentStatement = new StringBuilder();
                 }
             }
+
+            // 处理末尾没有分号的语句
+            String remaining = currentStatement.toString().trim();
+            if (!remaining.isEmpty()) {
+                try {
+                    jdbcTemplate.execute(remaining);
+                    statementCount++;
+                } catch (Exception e) {
+                    logger.warn("SQL 执行失败(可能已存在): {} - 原因: {}",
+                        remaining.length() > 80 ? remaining.substring(0, 80) + "..." : remaining,
+                        e.getMessage());
+                }
+            }
+
+            logger.info("SQL 文件 {} 执行完成，共 {} 条语句", fileName, statementCount);
         }
     }
 }

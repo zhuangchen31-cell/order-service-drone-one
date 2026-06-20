@@ -52,10 +52,20 @@
         FROM drone
         WHERE deleted = 0
         <if test="model != null and model != ''">
-            AND model LIKE CONCAT('%', #{model}, '%')
+            <if test="_databaseId == 'mysql'">
+                AND model LIKE CONCAT('%', #{model}, '%')
+            </if>
+            <if test="_databaseId != 'mysql'">
+                AND model LIKE '%' || #{model} || '%'
+            </if>
         </if>
         <if test="serialNumber != null and serialNumber != ''">
-            AND serial_number LIKE CONCAT('%', #{serialNumber}, '%')
+            <if test="_databaseId == 'mysql'">
+                AND serial_number LIKE CONCAT('%', #{serialNumber}, '%')
+            </if>
+            <if test="_databaseId != 'mysql'">
+                AND serial_number LIKE '%' || #{serialNumber} || '%'
+            </if>
         </if>
         <if test="status != null and status != ''">
             AND status = #{status}
@@ -91,10 +101,20 @@
         FROM drone
         WHERE deleted = 0
         <if test="model != null and model != ''">
-            AND model LIKE '%' || #{model} || '%'
+            <if test="_databaseId == 'mysql'">
+                AND model LIKE CONCAT('%', #{model}, '%')
+            </if>
+            <if test="_databaseId != 'mysql'">
+                AND model LIKE '%' || #{model} || '%'
+            </if>
         </if>
         <if test="serialNumber != null and serialNumber != ''">
-            AND serial_number LIKE '%' || #{serialNumber} || '%'
+            <if test="_databaseId == 'mysql'">
+                AND serial_number LIKE CONCAT('%', #{serialNumber}, '%')
+            </if>
+            <if test="_databaseId != 'mysql'">
+                AND serial_number LIKE '%' || #{serialNumber} || '%'
+            </if>
         </if>
         <if test="status != null and status != ''">
             AND status = #{status}

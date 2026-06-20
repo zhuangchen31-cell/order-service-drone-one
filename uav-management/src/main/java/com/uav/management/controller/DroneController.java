@@ -129,9 +129,9 @@ public class DroneController {
     }
 
     /**
-     * 处理删除无人机请求
+     * 处理删除无人机请求（POST：防止CSRF和爬虫误删）
      */
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public String delete(@PathVariable Long id) {
         try {
             logger.info("删除无人机，ID: {}", id);
@@ -148,9 +148,9 @@ public class DroneController {
     }
 
     /**
-     * 处理生成AI属性请求
+     * 处理生成AI属性请求（POST：防止CSRF和爬虫触发）
      */
-    @GetMapping("/generate-ai/{id}")
+    @PostMapping("/generate-ai/{id}")
     public String generateAI(@PathVariable Long id) {
         try {
             logger.info("生成AI属性，无人机ID: {}", id);

@@ -296,9 +296,18 @@
         .btn-sm:hover {
             transform: translateY(-2px) scale(1.05);
         }
+        /* 表单内按钮与链接按钮保持一致 */
+        form .btn-sm {
+            vertical-align: middle;
+        }
         .btn-info {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             border: none;
+            color: white;
+        }
+        .btn-info:hover {
+            background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+            color: white;
         }
         .btn-danger {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
@@ -396,6 +405,9 @@
             <a href="/drone/add" class="btn btn-primary btn-lg">
                 <i class="fa fa-plus-circle"></i> 添加无人机
             </a>
+            <a href="/logout" class="btn btn-default btn-lg pull-right">
+                <i class="fa fa-sign-out"></i> 退出登录
+            </a>
         </div>
 
         <!-- 搜索表单 -->
@@ -468,11 +480,18 @@
                             <a th:href="@{/drone/edit/{id}(id=${drone.id})}" class="btn btn-sm btn-primary" title="编辑">
                                 <i class="fa fa-edit"></i>
                             </a>
-                            <a th:href="@{/drone/delete/{id}(id=${drone.id})}" class="btn btn-sm btn-danger" 
-                               onclick="return confirm('确定要删除这架无人机吗？');" title="无人机删除中">
-                                <i class="fa fa-trash"></i>
-                            </a>
-                           
+                            <form th:action="@{/drone/delete/{id}(id=${drone.id})}" method="post" style="display:inline;"
+                                  onsubmit="return confirm('确定要删除这架无人机吗？');">
+                                <button type="submit" class="btn btn-sm btn-danger" title="删除无人机">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </form>
+                            <form th:action="@{/drone/generate-ai/{id}(id=${drone.id})}" method="post" style="display:inline;"
+                                  onsubmit="return confirm('确定为这架无人机生成 AI 属性吗？');">
+                                <button type="submit" class="btn btn-sm btn-info" title="生成AI属性">
+                                    <i class="fa fa-magic"></i>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 </tbody>

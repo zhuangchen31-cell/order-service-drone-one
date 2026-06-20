@@ -1,6 +1,6 @@
--- 插入管理员用户（密码：admin123，MD5加密后：e10adc3949ba59abbe56e057f20f883e）
+-- 插入管理员用户（密码：admin123，MD5哈希：0192023a7bbd73250516f069df18b500）
 INSERT OR IGNORE INTO user (username, password, salt, role, status, create_time) VALUES
-('admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin', 'ADMIN', 'ACTIVE', datetime('now'));
+('admin', '0192023a7bbd73250516f069df18b500', '', 'ADMIN', 'ACTIVE', datetime('now'));
 
 -- 插入测试无人机数据（使用 INSERT OR IGNORE 避免重复）
 INSERT OR IGNORE INTO drone (model, serial_number, manufacturer, purchase_date, status, ai_properties, deleted, create_time, update_time) VALUES

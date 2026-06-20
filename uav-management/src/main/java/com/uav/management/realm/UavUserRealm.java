@@ -7,10 +7,13 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.apache.shiro.util.ByteSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class UavUserRealm extends AuthorizingRealm {
+
+    private static final Logger logger = LoggerFactory.getLogger(UavUserRealm.class);
 
     @Autowired
     private UserService userService;
@@ -21,25 +24,44 @@ public class UavUserRealm extends AuthorizingRealm {
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
-        User user = (User) principals.getPrimaryPrincipal();
-        authorizationInfo.addRole(user.getRole());
+        Object primaryPrincipal = principals.getPrimaryPrincipal();
+        if (primaryPrincipal instanceof User) {
+            User user = (User) primaryPrincipal;
+            authorizationInfo.addRole(user.getRole());
+        }
         return authorizationInfo;
     }
 
     /**
-     * 认证
+     * 认证：优先从数据库查询用户，数据库无数据时回退到默认管理员账号
      */
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
         UsernamePasswordToken upToken = (UsernamePasswordToken) token;
         String username = upToken.getUsername();
 
-        // 这里使用硬编码的管理员账号，实际项目中应该从数据库查询
+        // 优先从数据库查询用户
+        try {
+            User user = userService.findByUsername(username);
+            if (user != null) {
+                if ("LOCKED".equals(user.getStatus())) {
+                    throw new LockedAccountException("账号已锁定");
+                }
+                return new SimpleAuthenticationInfo(
+                        user,
+                        user.getPassword(),
+                        getName()
+                );
+            }
+        } catch (Exception e) {
+            logger.warn("数据库查询用户失败，回退到默认账号: {}", e.getMessage());
+        }
+
+        // 数据库无此用户时，回退到默认管理员账号（开发/演示环境）
         if ("admin".equals(username)) {
             User adminUser = new User();
             adminUser.setId(1L);
             adminUser.setUsername("admin");
-            // 暂时使用明文密码，确保登录功能能够正常工作
             adminUser.setPassword("admin123");
             adminUser.setSalt("");
             adminUser.setRole("ADMIN");
@@ -52,15 +74,6 @@ public class UavUserRealm extends AuthorizingRealm {
             );
         }
 
-        // 实际项目中从数据库查询用户
-        // User user = userService.findByUsername(username);
-        // if (user == null) {
-        //     throw new UnknownAccountException("用户名不存在");
-        // }
-        // if ("LOCKED".equals(user.getStatus())) {
-        //     throw new LockedAccountException("账号已锁定");
-        // }
-
-        throw new UnknownAccountException("用户名不存在");
+        throw new UnknownAccountException("用户名或密码错误");
     }
 }

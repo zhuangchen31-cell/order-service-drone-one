@@ -14,11 +14,16 @@ import java.util.Map;
 public class ShiroConfig {
 
     /**
-     * 配置Realm
+     * 配置Realm（含 MD5 凭证匹配器以支持数据库存储的哈希密码）
      */
     @Bean
     public UavUserRealm userRealm() {
-        return new UavUserRealm();
+        UavUserRealm realm = new UavUserRealm();
+        HashedCredentialsMatcher matcher = new HashedCredentialsMatcher();
+        matcher.setHashAlgorithmName("MD5");
+        matcher.setHashIterations(1);
+        realm.setCredentialsMatcher(matcher);
+        return realm;
     }
 
     /**
@@ -46,14 +51,22 @@ public class ShiroConfig {
         // 配置未授权页面
         shiroFilter.setUnauthorizedUrl("/unauthorized");
 
-        // 配置过滤器链
+        // 配置过滤器链（顺序敏感：优先匹配的规则在前）
         Map<String, String> filterChainDefinitionMap = new LinkedHashMap<>();
-        // 匿名访问
+        // 匿名可访问：登录页、登出、静态资源
         filterChainDefinitionMap.put("/login", "anon");
+        filterChainDefinitionMap.put("/logout", "anon");
         filterChainDefinitionMap.put("/static/**", "anon");
-        filterChainDefinitionMap.put("/drone/**", "anon");  // 允许匿名访问无人机管理
+        filterChainDefinitionMap.put("/css/**", "anon");
+        filterChainDefinitionMap.put("/js/**", "anon");
+        filterChainDefinitionMap.put("/images/**", "anon");
+        // 需要认证才能访问
+        filterChainDefinitionMap.put("/drone/**", "authc");
+        filterChainDefinitionMap.put("/", "authc");
         // 需要admin角色
         filterChainDefinitionMap.put("/admin/**", "roles[ADMIN]");
+        // 其他所有请求需要认证
+        filterChainDefinitionMap.put("/**", "authc");
 
         shiroFilter.setFilterChainDefinitionMap(filterChainDefinitionMap);
         return shiroFilter;

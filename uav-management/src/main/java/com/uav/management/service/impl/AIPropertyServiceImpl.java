@@ -21,15 +21,12 @@ public class AIPropertyServiceImpl implements AIPropertyService {
     private DroneService droneService;
 
     /**
-     * 同步生成AI属性
+     * 同步生成AI属性（模拟AI分析过程）
      */
     @Override
     public String generate(Drone drone) {
         try {
-            // 模拟AI生成过程
-            Thread.sleep(1000);
-
-            // 生成无人机基本数据
+            // 生成无人机基本数据（模拟AI生成）
             Map<String, Object> properties = new HashMap<>();
             properties.put("机身重量", "2.5kg");
             properties.put("最大飞行时间", "30分钟");
