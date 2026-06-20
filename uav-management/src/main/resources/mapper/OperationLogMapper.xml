@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uav.management.mapper.OperationLogMapper">
+
+    <resultMap id="BaseResultMap" type="com.uav.management.entity.OperationLog">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="username" property="username" />
+        <result column="operation" property="operation" />
+        <result column="method" property="method" />
+        <result column="params" property="params" />
+        <result column="ip" property="ip" />
+        <result column="create_time" property="createTime" />
+        <result column="duration" property="duration" />
+        <result column="status" property="status" />
+        <result column="error_msg" property="errorMsg" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, user_id, username, operation, method, params, ip, create_time, duration, status, error_msg
+    </sql>
+
+    <insert id="insert" parameterType="com.uav.management.entity.OperationLog">
+        INSERT INTO operation_log (
+            user_id, username, operation, method, params, ip, create_time, duration, status, error_msg
+        ) VALUES (
+            #{userId}, #{username}, #{operation}, #{method}, #{params}, #{ip}, #{createTime}, #{duration}, #{status}, #{errorMsg}
+        )
+        <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
+            <if test="_databaseId == 'sqlite'">
+                SELECT last_insert_rowid()
+            </if>
+            <if test="_databaseId == 'mysql'">
+                SELECT LAST_INSERT_ID()
+            </if>
+        </selectKey>
+    </insert>
+
+</mapper>

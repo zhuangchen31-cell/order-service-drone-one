@@ -1,0 +1,38 @@
+# ===== Maven Build =====
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# ===== IDE =====
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+
+# ===== Logs =====
+logs/
+*.log
+
+# ===== Database =====
+data/
+*.db
+
+# ===== Environment =====
+.env
+application-*.yml
+
+# ===== Temporary =====
+*.tmp
+*.temp
+*.class
+
+# ===== Embedded Maven (keep wrapper, exclude full install) =====
+apache-maven-3.8.8/
+apache-maven-3.8.8-bin.zip
+
+# ===== Build output =====
+build/

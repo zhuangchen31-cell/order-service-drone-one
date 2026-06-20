@@ -1,0 +1,30 @@
+# Maven
+/target/
+/.mvn/
+
+# IDE
+/.idea/
+/.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Database
+/data/
+*.db
+
+# Environment variables
+.env
+application-*.yml
+
+# Temporary files
+*.tmp
+*.temp

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>添加无人机 - 无人机信息管理系统</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+            min-height: 100vh;
+            padding: 30px;
+        }
+        
+        .form-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #1e3c72;
+        }
+        
+        .form-header h1 {
+            font-size: 28px;
+            margin: 0;
+        }
+        
+        .form-row {
+            margin-bottom: 20px;
+        }
+        
+        .form-row label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .form-row label i {
+            margin-right: 8px;
+            color: #667eea;
+        }
+        
+        .form-row input,
+        .form-row select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            box-sizing: border-box;
+            transition: all 0.3s;
+        }
+        
+        .form-row select {
+            padding-right: 40px;
+            padding-top: 14px;
+            padding-bottom: 14px;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23666' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 14px 14px;
+            line-height: 1.5;
+            height: auto;
+        }
+        
+        .form-row input:focus,
+        .form-row select:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn-group {
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 12px 40px;
+            font-size: 16px;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 15px;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-default {
+            padding: 12px 40px;
+            font-size: 16px;
+            border-radius: 25px;
+            border: 2px solid #ddd;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #666;
+        }
+        
+        .btn-default:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .error-message {
+            color: #d9534f;
+            margin-top: 15px;
+            padding: 12px 15px;
+            background: #f8d7da;
+            border-radius: 8px;
+            border-left: 4px solid #d9534f;
+        }
+        
+        small.text-muted {
+            display: block;
+            margin-top: 6px;
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .data-section {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+        
+        .data-section h3 {
+            font-size: 18px;
+            color: #1e3c72;
+            margin-bottom: 20px;
+            margin-top: 0;
+        }
+        
+        .data-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 10px;
+        }
+        
+        .data-row label {
+            min-width: 130px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 0;
+        }
+        
+        .data-row .data-input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .data-row .data-input:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .data-row .unit {
+            color: #666;
+            font-size: 12px;
+            min-width: 50px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-header">
+            <h1><i class="fa fa-plus-circle"></i> 添加无人机</h1>
+        </div>
+        
+        <form action="/drone/add" method="post">
+            <div class="form-row">
+                <label for="model"><i class="fa fa-paper-plane"></i> 无人机型号</label>
+                <input type="text" id="model" name="model" placeholder="例如：DJI Mavic Air 2" required>
+            </div>
+            
+            <div class="form-row">
+                <label for="serialNumber"><i class="fa fa-barcode"></i> 序列号</label>
+                <input type="text" id="serialNumber" name="serialNumber" placeholder="例如：MAVIC-AIR-2-002" required>
+                <small class="text-muted">请确保序列号唯一</small>
+            </div>
+            
+            <div class="form-row">
+                <label for="manufacturer"><i class="fa fa-industry"></i> 制造商</label>
+                <input type="text" id="manufacturer" name="manufacturer" placeholder="例如：DJI" required>
+            </div>
+            
+            <div class="form-row">
+                <label for="purchaseDate"><i class="fa fa-calendar"></i> 购买日期</label>
+                <input type="date" id="purchaseDate" name="purchaseDate" required>
+            </div>
+            
+            <div class="form-row">
+                <label for="status"><i class="fa fa-info-circle"></i> 状态</label>
+                <select id="status" name="status" required>
+                    <option value="IN_USE">在用</option>
+                    <option value="MAINTENANCE">维修</option>
+                    <option value="RETIRED">报废</option>
+                </select>
+            </div>
+            
+            <div class="data-section">
+                <h3><i class="fa fa-cogs"></i> 无人机基本数据</h3>
+                <input type="hidden" id="aiProperties" name="aiProperties">
+                <div class="data-row">
+                    <label>机身重量</label>
+                    <input type="text" class="data-input" data-key="机身重量" placeholder="例如：2.5">
+                    <span class="unit">kg</span>
+                </div>
+                <div class="data-row">
+                    <label>最大飞行时间</label>
+                    <input type="text" class="data-input" data-key="最大飞行时间" placeholder="例如：30">
+                    <span class="unit">分钟</span>
+                </div>
+                <div class="data-row">
+                    <label>最大飞行速度</label>
+                    <input type="text" class="data-input" data-key="最大飞行速度" placeholder="例如：60">
+                    <span class="unit">km/h</span>
+                </div>
+                <div class="data-row">
+                    <label>最大飞行高度</label>
+                    <input type="text" class="data-input" data-key="最大飞行高度" placeholder="例如：500">
+                    <span class="unit">米</span>
+                </div>
+                <div class="data-row">
+                    <label>摄像头分辨率</label>
+                    <input type="text" class="data-input" data-key="摄像头分辨率" placeholder="例如：4K超清">
+                    <span class="unit"></span>
+                </div>
+                <div class="data-row">
+                    <label>电池容量</label>
+                    <input type="text" class="data-input" data-key="电池容量" placeholder="例如：5000">
+                    <span class="unit">mAh</span>
+                </div>
+                <div class="data-row">
+                    <label>GPS定位精度</label>
+                    <input type="text" class="data-input" data-key="GPS定位精度" placeholder="例如：±1.5">
+                    <span class="unit">米</span>
+                </div>
+                <div class="data-row">
+                    <label>翼展宽度</label>
+                    <input type="text" class="data-input" data-key="翼展宽度" placeholder="例如：120">
+                    <span class="unit">cm</span>
+                </div>
+                <div class="data-row">
+                    <label>机身长度</label>
+                    <input type="text" class="data-input" data-key="机身长度" placeholder="例如：85">
+                    <span class="unit">cm</span>
+                </div>
+                <div class="data-row">
+                    <label>巡航速度</label>
+                    <input type="text" class="data-input" data-key="巡航速度" placeholder="例如：45">
+                    <span class="unit">km/h</span>
+                </div>
+                <div class="data-row">
+                    <label>有效载荷</label>
+                    <input type="text" class="data-input" data-key="有效载荷" placeholder="例如：500">
+                    <span class="unit">g</span>
+                </div>
+                <div class="data-row">
+                    <label>通信距离</label>
+                    <input type="text" class="data-input" data-key="通信距离" placeholder="例如：5">
+                    <span class="unit">km</span>
+                </div>
+                <div class="data-row">
+                    <label>抗风等级</label>
+                    <input type="text" class="data-input" data-key="抗风等级" placeholder="例如：6">
+                    <span class="unit">级</span>
+                </div>
+                <div class="data-row">
+                    <label>工作温度</label>
+                    <input type="text" class="data-input" data-key="工作温度" placeholder="例如：-20°C~50°C">
+                    <span class="unit"></span>
+                </div>
+                <div class="data-row">
+                    <label>数据传输速率</label>
+                    <input type="text" class="data-input" data-key="数据传输速率" placeholder="例如：10">
+                    <span class="unit">Mbps</span>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button type="submit" class="btn-primary">
+                    <i class="fa fa-check"></i> 提交
+                </button>
+                <a href="/drone/list" class="btn-default">
+                    <i class="fa fa-arrow-left"></i> 返回主页
+                </a>
+            </div>
+            
+            <div class="error-message" th:if="${error}">
+                <i class="fa fa-exclamation-triangle"></i>
+                <span th:text="${error}"></span>
+            </div>
+        </form>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // 表单提交时，将数据同步到隐藏字段
+            $('form').on('submit', function() {
+                var properties = {};
+                $('.data-input').each(function() {
+                    var key = $(this).data('key');
+                    var value = $(this).val();
+                    if (value) {
+                        properties[key] = value;
+                    }
+                });
+                $('#aiProperties').val(JSON.stringify(properties));
+            });
+        });
+    </script>
+</body>
+</html>

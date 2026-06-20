@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uav.management.mapper.DroneMapper">
+
+    <resultMap id="BaseResultMap" type="com.uav.management.entity.Drone">
+        <id column="id" property="id" />
+        <result column="model" property="model" />
+        <result column="serial_number" property="serialNumber" />
+        <result column="manufacturer" property="manufacturer" />
+        <result column="purchase_date" property="purchaseDate" typeHandler="com.uav.management.typehandler.DateTypeHandler" />
+        <result column="status" property="status" />
+        <result column="ai_properties" property="aiProperties" />
+        <result column="deleted" property="deleted" />
+        <result column="create_time" property="createTime" typeHandler="com.uav.management.typehandler.DateTypeHandler" />
+        <result column="update_time" property="updateTime" typeHandler="com.uav.management.typehandler.DateTypeHandler" />
+        <result column="create_by" property="createBy" />
+        <result column="update_by" property="updateBy" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, model, serial_number, manufacturer, purchase_date, status, ai_properties, deleted, create_time, update_time, create_by, update_by
+    </sql>
+
+    <insert id="insert" parameterType="com.uav.management.entity.Drone">
+        INSERT INTO drone (
+            model, serial_number, manufacturer, purchase_date, status, 
+            ai_properties, deleted, create_time, update_time, create_by, update_by
+        ) VALUES (
+            #{model}, #{serialNumber}, #{manufacturer}, #{purchaseDate,typeHandler=com.uav.management.typehandler.DateTypeHandler}, #{status}, 
+            #{aiProperties}, #{deleted}, #{createTime,typeHandler=com.uav.management.typehandler.DateTypeHandler}, #{updateTime,typeHandler=com.uav.management.typehandler.DateTypeHandler}, #{createBy}, #{updateBy}
+        )
+        <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
+            <if test="_databaseId == 'sqlite'">
+                SELECT last_insert_rowid()
+            </if>
+            <if test="_databaseId == 'mysql'">
+                SELECT LAST_INSERT_ID()
+            </if>
+        </selectKey>
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM drone
+        WHERE id = #{id} AND deleted = 0
+    </select>
+
+    <select id="selectByCondition" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM drone
+        WHERE deleted = 0
+        <if test="model != null and model != ''">
+            AND model LIKE CONCAT('%', #{model}, '%')
+        </if>
+        <if test="serialNumber != null and serialNumber != ''">
+            AND serial_number LIKE CONCAT('%', #{serialNumber}, '%')
+        </if>
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
+        <if test="purchaseDateStart != null">
+            AND purchase_date &gt;= #{purchaseDateStart}
+        </if>
+        <if test="purchaseDateEnd != null">
+            AND purchase_date &lt;= #{purchaseDateEnd}
+        </if>
+        <choose>
+            <when test="orderBy == 'create_time' and orderDirection == 'ASC'">
+                ORDER BY create_time ASC
+            </when>
+            <when test="orderBy == 'create_time' and orderDirection == 'DESC'">
+                ORDER BY create_time DESC
+            </when>
+            <when test="orderBy == 'purchase_date' and orderDirection == 'ASC'">
+                ORDER BY purchase_date ASC
+            </when>
+            <when test="orderBy == 'purchase_date' and orderDirection == 'DESC'">
+                ORDER BY purchase_date DESC
+            </when>
+            <otherwise>
+                ORDER BY create_time DESC
+            </otherwise>
+        </choose>
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="countByCondition" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM drone
+        WHERE deleted = 0
+        <if test="model != null and model != ''">
+            AND model LIKE '%' || #{model} || '%'
+        </if>
+        <if test="serialNumber != null and serialNumber != ''">
+            AND serial_number LIKE '%' || #{serialNumber} || '%'
+        </if>
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
+        <if test="purchaseDateStart != null">
+            AND purchase_date &gt;= #{purchaseDateStart}
+        </if>
+        <if test="purchaseDateEnd != null">
+            AND purchase_date &lt;= #{purchaseDateEnd}
+        </if>
+    </select>
+
+    <update id="update" parameterType="com.uav.management.entity.Drone">
+        UPDATE drone
+        SET
+            model = #{model},
+            serial_number = #{serialNumber},
+            manufacturer = #{manufacturer},
+            purchase_date = #{purchaseDate,typeHandler=com.uav.management.typehandler.DateTypeHandler},
+            status = #{status},
+            ai_properties = #{aiProperties},
+            update_time = #{updateTime,typeHandler=com.uav.management.typehandler.DateTypeHandler},
+            update_by = #{updateBy}
+        WHERE id = #{id} AND deleted = 0
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM drone
+        WHERE id = #{id}
+    </delete>
+
+    <update id="softDeleteById">
+        UPDATE drone
+        SET deleted = 1,
+            update_time = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND deleted = 0
+    </update>
+
+    <select id="selectBySerialNumber" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM drone
+        WHERE serial_number = #{serialNumber}
+    </select>
+
+</mapper>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>无人机管理系统 - 访问入口</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        .status {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 5px;
+        }
+        .status-title {
+            color: #4caf50;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .status-item {
+            color: #555;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        .links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .link-button {
+            display: block;
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 500;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .link-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        .link-button.secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .link-button.info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-top: 30px;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #856404;
+        }
+        .note-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .icon {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚁 无人机管理系统</h1>
+        <p class="subtitle">欢迎使用无人机信息管理系统</p>
+        
+        <div class="status">
+            <div class="status-title">✅ 系统状态：运行中</div>
+            <div class="status-item">🟢 服务器：http://localhost:27543</div>
+            <div class="status-item">🟢 数据库：已初始化</div>
+            <div class="status-item">🟢 核心功能：正常工作</div>
+        </div>
+        
+        <div class="links">
+            <a href="http://localhost:27543/drone/add" class="link-button" target="_blank">
+                <span class="icon">➕</span>添加无人机
+            </a>
+            
+            <a href="http://localhost:27543/drone/list" class="link-button secondary" target="_blank">
+                <span class="icon">📋</span>查看无人机列表
+            </a>
+            
+            <a href="http://localhost:27543/" class="link-button info" target="_blank">
+                <span class="icon">🏠</span>访问首页
+            </a>
+        </div>
+        
+        <div class="note">
+            <div class="note-title">💡 使用提示</div>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>点击上方按钮将在新标签页中打开系统</li>
+                <li>确保应用程序正在运行（端口 27543）</li>
+                <li>推荐使用 Chrome、Firefox 或 Edge 浏览器</li>
+                <li>添加的数据会自动保存到数据库</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // 检查服务器是否可访问
+        fetch('http://localhost:27543/')
+            .then(response => {
+                console.log('服务器连接成功');
+            })
+            .catch(error => {
+                console.warn('无法连接到服务器，请确保应用程序正在运行');
+                alert('提示：无法连接到服务器\n\n请确保：\n1. 应用程序正在运行\n2. 端口 27543 未被占用\n3. 防火墙允许访问');
+            });
+    </script>
+</body>
+</html>
